@@ -6,15 +6,15 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
-use Laravel\Passport\Passport;
-
+use Laravel\Sanctum\Sanctum;
 
 class DrawControllerTest extends TestCase {
 
     use RefreshDatabase;
 
     public function test_create_draw() {
-        $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        Sanctum::actingAs($user, ['*']);
 
         $data = [
             'title' => 'test',

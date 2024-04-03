@@ -75,5 +75,7 @@ class DrawController extends Controller
         return response()->json([
             'draws' => $draws,
         ]);
-    }   
+    }
+    
+    
 }
