@@ -18,7 +18,7 @@ class DrawControllerTest extends TestCase {
 
         $data = [
             'title' => 'test',
-            'body_contet' => 'testing body content',
+            'body_content' => 'testing body content',
             'image' => UploadedFile::fake()->image('avatar.jpg') 
         ];
 
@@ -34,4 +34,4 @@ class DrawControllerTest extends TestCase {
             'message' => 'Draw created successfully'
         ]);
     }
-}
+}   
