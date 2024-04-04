@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Draw;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -20,27 +19,20 @@ class DrawController extends Controller
 
         $draw->user_id = Auth::user()->id;
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'body_content' => ['required', 'string'],
             'image' => 'required|image|max:2048',
         ]);
 
         if($request->hasFile('image')) {
-
-            $requestImage = $request->image;
-
-            $extension = $requestImage->extension();
-
-            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
-
-            $requestImage->storeAs('imgs', $imageName, 'public');
+            $imageName = $this->createImagePathAndSave($validated['image']);
 
             $draw->image = $imageName;
         }
 
-        $draw->name = $request->name;
-        $draw->body_content = $request->body_content; 
+        $draw->name = $validated['name'];
+        $draw->body_content = $validated['body_content']; 
 
         $draw->save();
         
@@ -50,19 +42,21 @@ class DrawController extends Controller
         ]);
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
-    public function destroy(Request $request): Response
+    public function destroy($id)
     {
-        Auth::guard('web')->logout();
+        $draw = Auth::user()->draws->find($id);
 
-        $request->session()->invalidate();
+        if ($draw) {
+            $draw->delete();
+            return response()->json([
+                'message' => 'Draw deleted successfully',
+            ]);
+        }
 
-        $request->session()->regenerateToken();
-
-        return response()->noContent();
-    }
+        return response()->json([
+            'message' => 'Draw not found',
+        ]);
+    }   
 
     public function index() {
         $draws = Draw::all();
@@ -76,6 +70,48 @@ class DrawController extends Controller
             'draws' => $draws,
         ]);
     }
-    
-    
+
+    public function update(Request $request, $id) {
+        $user = Auth::user();
+        $draw = $user->draws->find($id);
+
+        if (!$draw) {
+            return response()->json([
+                'message' => 'Draw not found', 
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => ['string', 'max:255'],
+            'body_content' => ['string'],
+            'image' => 'image|max:2048',
+        ]);
+
+        if($request->hasFile('image')) {
+            $imageName = $this->createImagePathAndSave($validated['image']);
+
+            $draw->image = $imageName;
+        }
+
+        $draw->name = $validated['name'];
+        $draw->body_content = $validated['body_content'];
+
+        $draw->save();
+
+        return response()->json([
+            'message' => 'Draw updated successfully',
+        ]);
+
+    }
+
+    private function createImagePathAndSave($image) {
+        $imageName = md5($image->getClientOriginalName() . strtotime("now")) . "." . $image->extension();
+
+        $image->storeAs('imgs', $imageName, 'public');
+        
+        return $imageName;
+    }
+
+
+
 }

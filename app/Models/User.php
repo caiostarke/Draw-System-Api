@@ -46,7 +46,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function draws() {
+    public function Draws() {
         return $this->hasMany(Draw::class);
     }
 }
