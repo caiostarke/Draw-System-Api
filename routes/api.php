@@ -17,3 +17,4 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::apiResource('draw', App\Http\Controllers\Api\DrawController::class);
+Route::apiResource('like', App\Http\Controllers\Api\LikeController::class);

@@ -104,6 +104,22 @@ class DrawController extends Controller
 
     }
 
+    public function show($id) {
+        $draw = Draw::find($id);
+
+        if (!$draw) {
+            return response()->json([
+                'message' => 'Draw not found', 
+            ], 404);
+        }   
+
+        $draw->image_url = Storage::url("imgs/" . $draw->image);
+        return response()->json([
+            'draw' => $draw,
+        ]);
+
+    }
+
     private function createImagePathAndSave($image) {
         $imageName = md5($image->getClientOriginalName() . strtotime("now")) . "." . $image->extension();
 
