@@ -49,4 +49,8 @@ class User extends Authenticatable
     public function Draws() {
         return $this->hasMany(Draw::class);
     }
+
+    public function likes()  {
+        return $this->hasMany(Like::class);
+    }
 }

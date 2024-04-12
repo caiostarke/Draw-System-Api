@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Draw extends Model
 {
@@ -17,6 +18,11 @@ class Draw extends Model
         "body_content"
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute() {
+        return Storage::url("imgs/" . $this->image);
+    }
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);

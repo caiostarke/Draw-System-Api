@@ -60,11 +60,6 @@ class DrawController extends Controller
 
     public function index() {
         $draws = Draw::all();
-
-        $draws->transform(function($draw) {
-            $draw->image_url = Storage::url("imgs/" . $draw->image);
-            return $draw;
-        });
         
         return response()->json([
             'draws' => $draws,
@@ -113,7 +108,6 @@ class DrawController extends Controller
             ], 404);
         }   
 
-        $draw->image_url = Storage::url("imgs/" . $draw->image);
         return response()->json([
             'draw' => $draw,
         ]);
