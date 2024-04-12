@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class DrawController extends Controller
+class LikeController extends Controller
 {
     /**
      * Handle an incoming authentication request.
@@ -24,14 +24,34 @@ class DrawController extends Controller
             'draw_id' => ['required', 'string'],
         ]);
 
+        $draw = Draw::find($validated['draw_id']);
+
+        if (!$draw) {
+            return response()->json([
+                'message' => 'Draw not found', 
+            ], 404);
+        }
+
         $like->draw_id = $validated['draw_id'];
+
+        $hasLiked = Like::where('user_id', $like->user_id)->where('draw_id', $like->draw_id)->first();
+
+        if ($hasLiked) {
+            $like->delete();
+
+            $hasLiked->delete();
+
+            return response()->json([
+                'message' => 'You unliked this draw succesfully',
+            ]);
+        }
 
         $like->save();
 
         return response()->json([
             'message' => 'You liked a draw Successfully',
-        ]);
-    }
+            ]);
+        }   
 
     // public function destroy($id)
     // {
@@ -118,7 +138,6 @@ class DrawController extends Controller
         
     //     return $imageName;
     // }
-
 
 
 }
