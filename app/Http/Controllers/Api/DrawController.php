@@ -60,10 +60,23 @@ class DrawController extends Controller
 
     public function index() {
         $draws = Draw::all();
-        
-        return response()->json([
-            'draws' => $draws,
-        ]);
+
+        if (!Auth::user()) {
+            return response()->json($draws);
+        }
+
+        $transformedDraws = $draws->map(function($draw) {
+            return [
+                'id' => $draw->id,
+                'name' => $draw->name,
+                'body_content' => $draw->body_content,
+                'image_url' => $draw->image_url,
+                'likes_count' => $draw->likes_count,
+                'liked' => $draw->userHasLiked(Auth::user()),
+            ];  
+        });
+
+        return response()->json($transformedDraws);
     }
 
     public function update(Request $request, $id) {
